@@ -14,6 +14,7 @@ let indexRouter = require('./routes/index');
 let configRouter = require('./routes/config');
 let adminRouter = require('./routes/admin');
 let usersRouter = require('./routes/users');
+let publicRouter = require('./routes/public');
 
 let app = express();
 
@@ -45,6 +46,7 @@ app.use('/api/handshake', (req, res, next) => {
 app.use('/api/config', configRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/user', usersRouter);
+app.use('/api/public', publicRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

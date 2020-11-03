@@ -25,7 +25,6 @@ router.get('/get', function (req, res, next) {
 router.all('/add', function (req, res, next) {
     util.JSONChecker(res, req.body, (data) => {
         //check if password is lift
-        data.upass = sha1(data.upass);
         mconfig.findOrCreate({where: {ctype: data.ctype}, defaults: data})
             .then(([config, created]) => {
                 if (created) {
@@ -38,4 +37,22 @@ router.all('/add', function (req, res, next) {
         })
     }, false)
 });
+
+router.all('/update', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        mconfig.findOne({where: {ctype: data.ctype}})
+            .then((config) => {
+                if (config) {
+                    config.cdata = data.cdata;
+                    config.update(config);
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, config);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1007, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, false)
+});
+
 module.exports = router;

@@ -7,7 +7,8 @@ let auth = require('./../auth/auth');
 let util = require('../utils/utils');
 //models
 let muser = require('./../models/musers');
-
+let mrequest = require('./../models/mrequests');
+let mcandidate = require('./../models/mcandidate');
 /* login user. */
 router.all('/login', function (req, res, next) {
     //check if body is empty
@@ -99,4 +100,67 @@ router.all('/update', function (req, res, next) {
         })
     }, false)
 });
+
+/* create request entries */
+router.all('/action/request', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        mrequest.findOrCreate({where: {ruid: data.ruid}, defaults: data})
+            .then(([request, created]) => {
+                if (created) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, request);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1007, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, false)
+});
+
+/*create a candidate request*/
+router.all('/action/candidate/request', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        mcandidate.findOrCreate({where: {cuid: data.cuid}, defaults: data})
+            .then(([request, created]) => {
+                if (created) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, request);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1007, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, false)
+});
+
+router.all('/action/candidate/get', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        mcandidate.findOne({where: {cuid: data.cuid}, defaults: data, include: [{model: muser, as: 'user'}]})
+            .then((request) => {
+                if (request) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, request);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1007, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, false)
+});
+
+router.get('/action/candidate/get-all', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        mcandidate.findAll({include: [{model: muser, as: 'user'}]})
+            .then((request) => {
+                if (request) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, request);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1007, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, true)
+});
+
 module.exports = router;

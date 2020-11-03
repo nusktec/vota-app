@@ -7,7 +7,7 @@ let auth = require('./../auth/auth');
 let util = require('../utils/utils');
 //models
 let muser = require('./../models/musers');
-
+let mrequest = require('./../models/mrequests');
 /* login user. */
 router.all('/login', function (req, res, next) {
     //check if body is empty
@@ -134,5 +134,59 @@ router.get('/action/list', function (req, res, next) {
             util.Jwr(res, {code: 428, error: 1005, action: false}, []);
         })
     }, true)
+});
+
+router.get('/action/requests/list', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        mrequest.findAll({include: [{model: muser, as: 'user'}]}).then((request) => {
+            if (request) {
+                util.Jwr(res, {code: 200, error: 2000, action: true}, request);
+            } else {
+                util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+            }
+        }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, true)
+});
+
+router.all('/action/requests/cmd', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        mrequest.findOne({where: {ruid: data.ruid}})
+            .then((request) => {
+                if (request) {
+                    request.rstatus = data.rstatus;
+                    request.update(request);
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, request);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, false)
+});
+
+/* create candidate type. */
+router.all('/action/candidate/create', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        //check if password is lift
+        if (data.upass.toString().length < 5) {
+            util.Jwr(res, {code: 416, error: 1008, action: false}, []);
+            return;
+        }
+        //assign sha1 password
+        data.upass = sha1(data.upass);
+        muser.findOrCreate({where: {uemail: data.uemail}, defaults: data})
+            .then(([user, created]) => {
+                if (created) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, user);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1007, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, false)
 });
 module.exports = router;
