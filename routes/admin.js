@@ -10,6 +10,7 @@ let muser = require('./../models/musers');
 let mfeedback = require('./../models/mfeedback');
 let mrequest = require('./../models/mrequests');
 let melection = require('./../models/melections');
+let mdoanation = require('./../models/mdonations');
 /* login user. */
 router.all('/login', function (req, res, next) {
     //check if body is empty
@@ -240,7 +241,7 @@ router.get('/election/get-all', function (req, res, next) {
 });
 
 /*
-FeedBack Session
+ FeedBack Session
  */
 router.get('/feedback/all', function (req, res, next) {
     util.JSONChecker(res, req.body, (data) => {
@@ -252,6 +253,25 @@ router.get('/feedback/all', function (req, res, next) {
                     util.Jwr(res, {code: 417, error: 1006, action: false}, []);
                 }
             }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, true)
+});
+
+/*
+ Donations Session
+ */
+router.get('/donation/all', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        mdoanation.findAll({include: [{model: muser, as: 'user', attributes: ['uid', 'uemail', 'uname', 'uavatar']}]})
+            .then((donation) => {
+                if (donation) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, donation);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+                }
+            }).catch(err => {
+                console.log(err);
             util.Jwr(res, {code: 428, error: 1005, action: false}, []);
         })
     }, true)

@@ -26,6 +26,7 @@ Users.init({
     uissues: {type: eng.DataTypes.TEXT, allowNull: true},
     usolutions: {type: eng.DataTypes.TEXT, allowNull: true},
     usession: {type: eng.DataTypes.STRING(255), allowNull: true},
+    uverify: {type: eng.DataTypes.INTEGER, allowNull: false, defaultValue: 0},
 }, {sequelize: conn, modelName: 'rs_users'});
 conn.sync();
 module.exports = Users;

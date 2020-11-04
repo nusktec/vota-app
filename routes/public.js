@@ -15,6 +15,7 @@ let mvote = require('./../models/mvotes');
 let melection = require('./../models/melections');
 let mfeedback = require('./../models/mfeedback');
 let mnetwork = require('./../models/mnetwork');
+let mdonation = require('./../models/mdonations');
 
 /* get public data. */
 router.all('/get', function (req, res, next) {
@@ -354,5 +355,43 @@ router.all('/network/get-user-all', function (req, res, next) {
             util.Jwr(res, {code: 428, error: 1005, action: false}, []);
         })
     }, false);
+});
+
+/**
+ * Donations session
+ */
+router.all('/donation/add', function (req, res, next) {
+    //check if body is empty
+    util.JSONChecker(res, req.body, (data) => {
+        mdonation.create(data)
+            .then((network) => {
+                if (network !== null) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, network);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, true);
+});
+
+/**
+ * Main data for public use
+ */
+router.get('/main-data', function (req, res, next) {
+    //check if body is empty
+    util.JSONChecker(res, req.body, async (data) => {
+        try {
+            const [results, metadata] = await mysql.conn.query("select sum(dn.damount) as total_donations, (select count(*) from rs_candidates) as total_electorate from rs_donations dn");
+            if (results !== null) {
+                util.Jwr(res, {code: 200, error: 2000, action: true}, results);
+                return;
+            }
+            util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+        } catch (ex) {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        }
+    }, true);
 });
 module.exports = router;
