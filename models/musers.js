@@ -21,6 +21,10 @@ Users.init({
     ubio: {type: eng.DataTypes.STRING, allowNull: true},
     utype: {type: eng.DataTypes.INTEGER, allowNull: false, defaultValue: 0},
     ucandidate: {type: eng.DataTypes.INTEGER, allowNull: false, defaultValue: 0},
+    upvc: {type: eng.DataTypes.STRING(255), allowNull: true},
+    uparty: {type: eng.DataTypes.STRING(255), allowNull: true},
+    uissues: {type: eng.DataTypes.TEXT, allowNull: true},
+    usolutions: {type: eng.DataTypes.TEXT, allowNull: true},
     usession: {type: eng.DataTypes.STRING(255), allowNull: true},
 }, {sequelize: conn, modelName: 'rs_users'});
 conn.sync();
