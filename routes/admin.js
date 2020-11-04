@@ -7,7 +7,9 @@ let auth = require('./../auth/auth');
 let util = require('../utils/utils');
 //models
 let muser = require('./../models/musers');
+let mfeedback = require('./../models/mfeedback');
 let mrequest = require('./../models/mrequests');
+let melection = require('./../models/melections');
 /* login user. */
 router.all('/login', function (req, res, next) {
     //check if body is empty
@@ -188,5 +190,70 @@ router.all('/action/candidate/create', function (req, res, next) {
             util.Jwr(res, {code: 428, error: 1005, action: false}, []);
         })
     }, false)
+});
+
+/**
+ * Election Session
+ */
+router.all('/election/add', function (req, res, next) {
+    //check if body is empty
+    util.JSONChecker(res, req.body, (data) => {
+        melection.create(data)
+            .then((created) => {
+                if (created !== null) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, created);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, false);
+});
+
+router.all('/election/del', function (req, res, next) {
+    //check if body is empty
+    util.JSONChecker(res, req.body, (data) => {
+        melection.destroy({where: {eid: data.eid}})
+            .then((resp) => {
+                util.Jwr(res, {code: 200, error: 2000, action: true}, resp);
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, false);
+});
+
+router.get('/election/get-all', function (req, res, next) {
+    //check if body is empty
+    util.JSONChecker(res, req.body, (data) => {
+        melection.findAll({order: [['eid', 'DESC']]})
+            .then((election) => {
+                if (election !== null) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, election);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, true);
+});
+
+/*
+FeedBack Session
+ */
+router.get('/feedback/all', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        mfeedback.findAll()
+            .then((feedback) => {
+                if (feedback) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, feedback);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, true)
 });
 module.exports = router;

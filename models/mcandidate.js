@@ -13,6 +13,12 @@ Mcandidate.init({
     ctype: {type: eng.DataTypes.STRING, allowNull: false},
     cposition: {type: eng.DataTypes.STRING, allowNull: false},
     clocation: {type: eng.DataTypes.STRING, allowNull: false},
+    cideology: {type: eng.DataTypes.STRING, allowNull: true},
+    chistory: {type: eng.DataTypes.STRING, allowNull: true},
+    csocial_ins: {type: eng.DataTypes.STRING, allowNull: true},
+    csocial_fb: {type: eng.DataTypes.STRING, allowNull: true},
+    csocial_tw: {type: eng.DataTypes.STRING, allowNull: true},
+    csocial_web: {type: eng.DataTypes.STRING, allowNull: true},
 }, {sequelize: conn, modelName: 'rs_candidates'});
 Mcandidate.belongsTo(muser, {as: 'user', foreignKey: 'cuid'});
 conn.sync();

@@ -135,7 +135,7 @@ router.all('/action/candidate/request', function (req, res, next) {
 
 router.all('/action/candidate/get', function (req, res, next) {
     util.JSONChecker(res, req.body, (data) => {
-        mcandidate.findOne({where: {cuid: data.cuid}, defaults: data, include: [{model: muser, as: 'user'}]})
+        mcandidate.findOne({where: {cuid: data.cuid}, include: [{model: muser, as: 'user'}]})
             .then((request) => {
                 if (request) {
                     util.Jwr(res, {code: 200, error: 2000, action: true}, request);
@@ -150,7 +150,22 @@ router.all('/action/candidate/get', function (req, res, next) {
 
 router.get('/action/candidate/get-all', function (req, res, next) {
     util.JSONChecker(res, req.body, (data) => {
-        mcandidate.findAll({include: [{model: muser, as: 'user'}]})
+        mcandidate.findAll({include: [{model: muser, as: 'user'}], order: [['cid', 'DESC']]})
+            .then((request) => {
+                if (request) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, request);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1007, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, true)
+});
+
+router.all('/action/get-user-id', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        muser.findOne({where: {uid: data.uid}})
             .then((request) => {
                 if (request) {
                     util.Jwr(res, {code: 200, error: 2000, action: true}, request);
