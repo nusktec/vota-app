@@ -15,6 +15,7 @@ let configRouter = require('./routes/config');
 let adminRouter = require('./routes/admin');
 let usersRouter = require('./routes/users');
 let publicRouter = require('./routes/public');
+let uploadRouter = require('./routes/uploads');
 
 let app = express();
 
@@ -47,6 +48,8 @@ app.use('/api/config', configRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/user', usersRouter);
 app.use('/api/public', publicRouter);
+//uploads api
+app.use('/api/uploads', uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
