@@ -245,7 +245,7 @@ router.get('/election/get-all', function (req, res, next) {
  */
 router.get('/feedback/all', function (req, res, next) {
     util.JSONChecker(res, req.body, (data) => {
-        mfeedback.findAll()
+        mfeedback.findAll({include: {model: muser, as: 'user'}})
             .then((feedback) => {
                 if (feedback) {
                     util.Jwr(res, {code: 200, error: 2000, action: true}, feedback);
@@ -271,7 +271,6 @@ router.get('/donation/all', function (req, res, next) {
                     util.Jwr(res, {code: 417, error: 1006, action: false}, []);
                 }
             }).catch(err => {
-                console.log(err);
             util.Jwr(res, {code: 428, error: 1005, action: false}, []);
         })
     }, true)

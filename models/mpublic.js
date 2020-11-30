@@ -15,7 +15,8 @@ MPublic.init({
     palias: {type: eng.DataTypes.STRING, allowNull: false},
     pbanner: {type: eng.DataTypes.TEXT, allowNull: false},
     pbody: {type: eng.DataTypes.TEXT, allowNull: false},
-    pdate: {type: eng.DataTypes.STRING, allowNull: true},
+    pdate: {type: eng.DataTypes.DATE, allowNull: true},
+    plocation: {type: eng.DataTypes.STRING, allowNull: true},
     ptype: {type: eng.DataTypes.INTEGER, allowNull: false, defaultValue: 1},
     pstatus: {type: eng.DataTypes.INTEGER, allowNull: false, defaultValue: 0},
 }, {sequelize: conn, modelName: 'rs_public'});

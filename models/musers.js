@@ -22,6 +22,8 @@ Users.init({
     utype: {type: eng.DataTypes.INTEGER, allowNull: false, defaultValue: 0},
     ucandidate: {type: eng.DataTypes.INTEGER, allowNull: false, defaultValue: 0},
     upvc: {type: eng.DataTypes.STRING(255), allowNull: true},
+    ulga: {type: eng.DataTypes.STRING(255), allowNull: true},
+    uidiology: {type: eng.DataTypes.STRING(255), allowNull: true},
     uparty: {type: eng.DataTypes.STRING(255), allowNull: true},
     uissues: {type: eng.DataTypes.TEXT, allowNull: true},
     usolutions: {type: eng.DataTypes.TEXT, allowNull: true},

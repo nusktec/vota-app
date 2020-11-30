@@ -24,14 +24,13 @@ router.all('/get', function (req, res, next) {
         mpublic.findOne({
             where: {pid: data.pid, pstatus: 1},
             include: [{model: muser, as: 'user', attributes: ['uemail', 'uavatar', 'uphone', 'uid']}]
-        })
-            .then((xpublic) => {
-                if (xpublic !== null) {
-                    util.Jwr(res, {code: 200, error: 2000, action: true}, xpublic);
-                } else {
-                    util.Jwr(res, {code: 417, error: 1006, action: false}, []);
-                }
-            }).catch(err => {
+        }).then((xpublic) => {
+            if (xpublic !== null) {
+                util.Jwr(res, {code: 200, error: 2000, action: true}, xpublic);
+            } else {
+                util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+            }
+        }).catch(err => {
             util.Jwr(res, {code: 428, error: 1005, action: false}, []);
         })
     }, true);
@@ -43,19 +42,54 @@ router.all('/get-alias', function (req, res, next) {
         mpublic.findOne({
             where: {palias: data.palias, pstatus: 1},
             include: [{model: muser, as: 'user', attributes: ['uemail', 'uavatar', 'uphone', 'uid']}]
+        }).then((xpublic) => {
+            if (xpublic !== null) {
+                util.Jwr(res, {code: 200, error: 2000, action: true}, xpublic);
+            } else {
+                util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+            }
+        }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
         })
-            .then((xpublic) => {
-                if (xpublic !== null) {
-                    util.Jwr(res, {code: 200, error: 2000, action: true}, xpublic);
-                } else {
-                    util.Jwr(res, {code: 417, error: 1006, action: false}, []);
-                }
-            }).catch(err => {
+    }, true);
+});
+//////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+router.all('/get-location', function (req, res, next) {
+    //check if body is empty
+    util.JSONChecker(res, req.body, (data) => {
+        mpublic.findOne({
+            where: {plocation: data.plocation, pstatus: 1},
+            include: [{model: muser, as: 'user', attributes: ['uemail', 'uavatar', 'uphone', 'uid']}]
+        }).then((xpublic) => {
+            if (xpublic !== null) {
+                util.Jwr(res, {code: 200, error: 2000, action: true}, xpublic);
+            } else {
+                util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+            }
+        }).catch(err => {
             util.Jwr(res, {code: 428, error: 1005, action: false}, []);
         })
     }, true);
 });
 
+router.all('/get-up-coming', function (req, res, next) {
+    //check if body is empty
+    util.JSONChecker(res, req.body, (data) => {
+        mpublic.findOne({
+            where: {pstatus: 1, pdate: {$gte: mysql.literal('NOW()')}},
+            include: [{model: muser, as: 'user', attributes: ['uemail', 'uavatar', 'uphone', 'uid']}]
+        }).then((xpublic) => {
+            if (xpublic !== null) {
+                util.Jwr(res, {code: 200, error: 2000, action: true}, xpublic);
+            } else {
+                util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+            }
+        }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, true);
+});
+//////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 router.get('/get-all', function (req, res, next) {
     //check if body is empty
     util.JSONChecker(res, req.body, (data) => {
@@ -250,6 +284,36 @@ router.get('/election/get-all', function (req, res, next) {
         })
     }, true);
 });
+router.get('/election/get-by-location', function (req, res, next) {
+    //check if body is empty
+    util.JSONChecker(res, req.body, (data) => {
+        melection.findAll({where: {elocation: data.elocation}, order: [['eid', 'DESC']]})
+            .then((election) => {
+                if (election !== null) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, election);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, true);
+});
+router.get('/election/get-all-future', function (req, res, next) {
+    //check if body is empty
+    util.JSONChecker(res, req.body, (data) => {
+        melection.findAll({order: [['eid', 'DESC']], where: {edate: {$gte: mysql.literal('NOW()')}}},)
+            .then((election) => {
+                if (election !== null) {
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, election);
+                } else {
+                    util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, true);
+});
 
 /**
  * Submission Session
@@ -287,7 +351,6 @@ router.all('/submission/get-user-submission', function (req, res, next) {
         })
     }, true);
 });
-
 /*
  Feedback session
  */
@@ -344,7 +407,14 @@ router.all('/network/del', function (req, res, next) {
 router.all('/network/get-user-all', function (req, res, next) {
     //check if body is empty
     util.JSONChecker(res, req.body, (data) => {
-        mnetwork.findAll({where: {nuid: data.nuid}, include: [{model: mcandidate, as: 'candidate', include: [{model: muser, as: 'user', attributes: {exclude: ['upass']}}]}]})
+        mnetwork.findAll({
+            where: {nuid: data.nuid},
+            include: [{
+                model: mcandidate,
+                as: 'candidate',
+                include: [{model: muser, as: 'user', attributes: {exclude: ['upass']}}]
+            }]
+        })
             .then((network) => {
                 if (network !== null) {
                     util.Jwr(res, {code: 200, error: 2000, action: true}, network);
@@ -384,6 +454,23 @@ router.get('/main-data', function (req, res, next) {
     util.JSONChecker(res, req.body, async (data) => {
         try {
             const [results, metadata] = await mysql.conn.query("select sum(dn.damount) as total_donations, (select count(*) from rs_candidates) as total_electorate from rs_donations dn");
+            if (results !== null) {
+                util.Jwr(res, {code: 200, error: 2000, action: true}, results);
+                return;
+            }
+            util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+        } catch (ex) {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        }
+    }, true);
+});
+
+//dashboard
+router.get('/charts', function (req, res, next) {
+    //check if body is empty
+    util.JSONChecker(res, req.body, async (data) => {
+        try {
+            const [results, metadata] = await mysql.conn.query("select count(*) as total_posts, (select count(*) from rs_publics where ptype=2) as total_events, (select count(*) from rs_users where uverify=1) as total_verified_users, (select count(*) from rs_users where uverify=0) as total_unverified_users, (select count(*) from rs_networks) as total_networks, (select count(*) from rs_comments) as total_comments, (select count(*) from rs_candidates) as total_candidates, (select count(*) from rs_elections) as total_elections, (select count(*) from rs_requests where rstatus=1) as total_approved_requests, (select count(*) from rs_feedbacks) as total_feedbacks, (select count(*) from rs_votes) as total_votes from rs_publics where ptype=1");
             if (results !== null) {
                 util.Jwr(res, {code: 200, error: 2000, action: true}, results);
                 return;

@@ -11,7 +11,7 @@ MElection.init({
     etype: {type: eng.DataTypes.STRING, allowNull: false},
     elocation: {type: eng.DataTypes.STRING, allowNull: false},
     ebanner: {type: eng.DataTypes.TEXT, allowNull: false},
-    edate: {type: eng.DataTypes.STRING, allowNull: false},
+    edate: {type: eng.DataTypes.DATE, allowNull: false},
 }, {sequelize: conn, modelName: 'rs_elections'});
 conn.sync();
 module.exports = MElection;

@@ -16,6 +16,8 @@ let adminRouter = require('./routes/admin');
 let usersRouter = require('./routes/users');
 let publicRouter = require('./routes/public');
 let uploadRouter = require('./routes/uploads');
+let billRouter = require('./routes/bills');
+let surveyRouter = require('./routes/survey');
 
 let app = express();
 
@@ -48,6 +50,8 @@ app.use('/api/config', configRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/user', usersRouter);
 app.use('/api/public', publicRouter);
+app.use('/api/bill', billRouter);
+app.use('/api/survey', surveyRouter);
 //uploads api
 app.use('/api/uploads', uploadRouter);
 

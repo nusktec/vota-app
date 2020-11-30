@@ -4,7 +4,7 @@
 let tmpUtils = require('./tmpUtils');
 //json writer
 function Jwr(res, status, data) {
-    res.status((status.code ? status.code : 428)).jsonp({
+    res.status((status.code ? (status.code === true ? 200 : status.code) : 428)).jsonp({
         boot: status.error,
         action: status.action,
         data: data,
