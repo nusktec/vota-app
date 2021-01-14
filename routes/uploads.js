@@ -34,7 +34,11 @@ router.all('/image', function (req, res, next) {
         }
         let filename = "assets/images/" + req.files.image.md5 + ".jpg";
         await moveFile(req.files.image.tempFilePath, 'public/' + filename);
-        util.Jwr(res, true, {url: req.get('host') + "/" + filename}, "Uploaded !");
+        res.status(200);
+        res.jsonp({
+            data: {url: req.get('host') + "/" + filename},
+            resp: "uploaded successfully"
+        });
     })().catch(err => {
         util.Jwr(res, false, {url: null, err: err}, "Uploading Unsuccessful 0400");
     });

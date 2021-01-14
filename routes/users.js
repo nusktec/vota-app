@@ -1,4 +1,5 @@
 let express = require('express');
+let request = require('request');
 let router = express.Router();
 let sha1 = require('sha1');
 let md5 = require('md5');
@@ -9,6 +10,8 @@ let util = require('../utils/utils');
 let muser = require('./../models/musers');
 let mrequest = require('./../models/mrequests');
 let mcandidate = require('./../models/mcandidate');
+
+const {Op} = require('sequelize');
 /* login user. */
 router.all('/login', function (req, res, next) {
     //check if body is empty
@@ -53,6 +56,32 @@ router.all('/create', function (req, res, next) {
     }, false)
 });
 
+router.all('/create-social', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        //check if password is lift
+        data.upass = "123456";
+        //assign sha1 password
+        data.upass = sha1(data.upass);
+        data.uname = "Vota Member";
+        muser.findOrCreate({where: {uemail: data.uemail}, defaults: data})
+            .then(([user, created]) => {
+                if (created) {
+                    user.update({usession: md5(user.uid)});
+                    //generate token
+                    user = user.get({plain: true});
+                    user.utoken = auth.Jsign(user, sha1(user.uid));
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, user);
+                } else {
+                    user = user.get({plain: true});
+                    user.utoken = auth.Jsign(user, sha1(user.uid));
+                    util.Jwr(res, {code: 200, error: 2000, action: true}, user);
+                }
+            }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, false)
+});
+
 /* password reset. */
 router.all('/reset', function (req, res, next) {
     //check if body is empty
@@ -64,7 +93,9 @@ router.all('/reset', function (req, res, next) {
                     let _tmpPass = util.util.getRandomChar(10);
                     user.update({upass: sha1(_tmpPass)});
                     //send email containing the password
+                    request.get('http://vota-ng.org/email/sender.php?to=' + user.uemail + '&body=Hi, ' + user.uname + '<br>You requested for password rest with the auto generated password below:<br><h3>' + _tmpPass + '</h3>' + '&title=Password Reset Request', function (err, res, body) {
 
+                    });
                     //blank display if dev
                     if (!util.getEnvStatus(req)) {
                         _tmpPass = ''
@@ -96,6 +127,22 @@ router.all('/update', function (req, res, next) {
                     util.Jwr(res, {code: 417, error: 1006, action: false}, []);
                 }
             }).catch(err => {
+            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        })
+    }, false)
+});
+
+/* user search. */
+router.all('/search', function (req, res, next) {
+    util.JSONChecker(res, req.body, (data) => {
+        muser.findAll({where: {uname: {[Op.substring]: data.name}}, order: [['uname', 'ASC']]}).then((user) => {
+            if (user) {
+                util.Jwr(res, {code: 200, error: 2000, action: true}, user);
+            } else {
+                util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+            }
+        }).catch(err => {
+            console.log(err);
             util.Jwr(res, {code: 428, error: 1005, action: false}, []);
         })
     }, false)

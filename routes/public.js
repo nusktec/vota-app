@@ -190,13 +190,14 @@ router.get('/vote/get-candidates', function (req, res, next) {
     //check if body is empty
     util.JSONChecker(res, req.body, async (data) => {
         try {
-            const [results, metadata] = await mysql.conn.query("select cc.*, uu.*, (select count(*) from rs_votes cv where cv.vcid=cc.cid) as cvotes from rs_candidates cc inner join rs_users uu on cc.cuid=uu.uid");
+            const [results, metadata] = await mysql.conn.query("select cc.*, uu.*, (select count(*) from rs_networks where nuid='"+data.nuid+"' and ncid=cc.cid)>0 as isNetworked, (select count(*) from rs_votes cv where cv.vcid=cc.cid) as cvotes from rs_candidates cc inner join rs_users uu on cc.cuid=uu.uid");
             if (results !== null) {
                 util.Jwr(res, {code: 200, error: 2000, action: true}, results);
                 return;
             }
             util.Jwr(res, {code: 417, error: 1006, action: false}, []);
         } catch (ex) {
+            console.log(ex);
             util.Jwr(res, {code: 428, error: 1005, action: false}, []);
         }
     }, true);
@@ -412,10 +413,10 @@ router.all('/network/get-user-all', function (req, res, next) {
             include: [{
                 model: mcandidate,
                 as: 'candidate',
-                include: [{model: muser, as: 'user', attributes: {exclude: ['upass']}}]
-            }]
-        })
-            .then((network) => {
+                include: [{model: muser, as: 'user', attributes: {exclude: ['upass', 'session']}}]
+            }],
+            attributes: {include: [[mysql.engine.literal('nuid='+data.nuid), 'isNetworked']]},
+        }).then((network) => {
                 if (network !== null) {
                     util.Jwr(res, {code: 200, error: 2000, action: true}, network);
                 } else {

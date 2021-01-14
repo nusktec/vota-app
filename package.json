@@ -11,15 +11,16 @@
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "express-fileupload": "^1.1.7-alpha.3",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "jsonwebtoken": "^8.5.1",
     "md5": "^2.2.1",
     "morgan": "~1.9.1",
-    "mysql2": "^2.1.0",
-    "sequelize": "^5.21.9",
-    "sha1": "^1.1.1",
     "move-file": "^2.0.0",
-    "express-fileupload": "^1.1.7-alpha.3"
+    "mysql2": "^2.1.0",
+    "request": "^2.88.2",
+    "sequelize": "^5.21.9",
+    "sha1": "^1.1.1"
   }
 }
