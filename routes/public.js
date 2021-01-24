@@ -197,7 +197,6 @@ router.get('/vote/get-candidates', function (req, res, next) {
             }
             util.Jwr(res, {code: 417, error: 1006, action: false}, []);
         } catch (ex) {
-            console.log(ex);
             util.Jwr(res, {code: 428, error: 1005, action: false}, []);
         }
     }, true);
