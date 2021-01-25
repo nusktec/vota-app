@@ -474,7 +474,7 @@ router.get('/charts', function (req, res, next) {
             if (results !== null) {
                 util.Jwr(res, {code: 200, error: 2000, action: true}, results);
                 return;
-            }
+            } 
             util.Jwr(res, {code: 417, error: 1006, action: false}, []);
         } catch (ex) {
             util.Jwr(res, {code: 428, error: 1005, action: false}, []);

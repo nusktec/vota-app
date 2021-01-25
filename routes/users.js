@@ -6,6 +6,7 @@ let md5 = require('md5');
 let auth = require('./../auth/auth');
 //custom libs
 let util = require('../utils/utils');
+let mysql = require('./../models/mysql');
 //models
 let muser = require('./../models/musers');
 let mrequest = require('./../models/mrequests');
@@ -134,17 +135,29 @@ router.all('/update', function (req, res, next) {
 
 /* user search. */
 router.all('/search', function (req, res, next) {
-    util.JSONChecker(res, req.body, (data) => {
-        muser.findAll({where: {uname: {[Op.substring]: data.name}}, order: [['uname', 'ASC']]}).then((user) => {
-            if (user) {
-                util.Jwr(res, {code: 200, error: 2000, action: true}, user);
-            } else {
-                util.Jwr(res, {code: 417, error: 1006, action: false}, []);
-            }
-        }).catch(err => {
-            console.log(err);
-            util.Jwr(res, {code: 428, error: 1005, action: false}, []);
-        })
+    util.JSONChecker(res, req.body, async (data) => {
+        //raw sql in search
+      try{
+          const [results, metadata] = await mysql.conn.query("select uu.*, cc.* from rs_users uu inner join rs_candidates cc on uu.uid=cc.cuid WHERE uu.uname LIKE '%"+data.name+"'");
+          if(results){
+              util.Jwr(res, {code: 200, error: 2000, action: true}, results);
+          }else{
+              util.Jwr(res, {code: 200, error: 2000, action: false}, []);
+          }
+      }catch (ex){
+          console.log(ex);
+          util.Jwr(res, {code: 200, error: 2000, action: false}, []);
+      }
+        // muser.findAll({where: {uname: {[Op.substring]: data.name}}, order: [['uname', 'ASC']]}).then((user) => {
+        //     if (user) {
+        //         util.Jwr(res, {code: 200, error: 2000, action: true}, user);
+        //     } else {
+        //         util.Jwr(res, {code: 417, error: 1006, action: false}, []);
+        //     }
+        // }).catch(err => {
+        //     console.log(err);
+        //     util.Jwr(res, {code: 428, error: 1005, action: false}, []);
+        // })
     }, false)
 });
 
