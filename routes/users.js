@@ -138,14 +138,13 @@ router.all('/search', function (req, res, next) {
     util.JSONChecker(res, req.body, async (data) => {
         //raw sql in search
       try{
-          const [results, metadata] = await mysql.conn.query("select uu.*, cc.* from rs_users uu inner join rs_candidates cc on uu.uid=cc.cuid WHERE uu.uname LIKE '%"+data.name+"'");
+          const [results, metadata] = await mysql.conn.query("select uu.*, cc.*, (select count(*) from rs_networks where nuid=uu.uid and ncid=cc.cid)>0 as isNetworked from rs_users uu inner join rs_candidates cc on uu.uid=cc.cuid WHERE uu.uname LIKE '"+data.name+"%'");
           if(results){
               util.Jwr(res, {code: 200, error: 2000, action: true}, results);
           }else{
               util.Jwr(res, {code: 200, error: 2000, action: false}, []);
           }
       }catch (ex){
-          console.log(ex);
           util.Jwr(res, {code: 200, error: 2000, action: false}, []);
       }
         // muser.findAll({where: {uname: {[Op.substring]: data.name}}, order: [['uname', 'ASC']]}).then((user) => {
